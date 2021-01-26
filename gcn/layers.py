@@ -1,4 +1,5 @@
 import torch.nn as nn
+import torch.nn.functional as F
 import numpy as np
 
 
@@ -13,7 +14,7 @@ def dropout_sparse(x, keep_prob, num_nonzero_elems):
     noise_shape    = [num_nonzero_elems]
     random_tensor  = keep_prob
     random_tensor += torch.rand(noise_shape)
-    mask           = torch.floor(randome_tensor)
+    mask           = torch.floor(random_tensor).type(torch.floor)
     rc             = x._indices()[:,mask]
     val            = x._values()[mask]*(1.0/keep_prob)
     return torch.sparse.FloatTensor(rc,val)
@@ -38,7 +39,7 @@ class GraphConvolution(nn.Module):
 
 class GraphConvolutionSparse(nn.Module):
     """ Graph convolution layer for sparse inputs """
-    def __init__ (self, inputDim, outputDim, adjacenyMatrix, featureMatrix, dropout=0):
+    def __init__ (self, inputDim, outputDim, adjacenyMatrix, featureMatrix, dropout=0, **kwargs):
         super(GraphConvolutionSparse, self).__init__()
         self.weights        = weight_variable_glorot(inputDim, outputDim)
         self.dropout        = dropout
@@ -63,4 +64,9 @@ class InnerProductDecoder(nn.Module):
 
     def forward(self, inputs):
         inputs = F.dropout(inputs, 1-self.dropout)
-        inputs = F.transpose(inputs)
+        x      = F.transpose(inputs, 0, 1) # Let's hope this works
+        inputs = torch.matmul(inputs, x)
+        inputs = torch.reshape(inputs, (-1,))
+        outputs= F.sigmoid(inputs)
+        return outputs
+        
