@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn import preprocessing
 
-import BertBaseDataset
+import Dataset
 import config
 
 
@@ -24,7 +24,7 @@ def split_dataset(df, year):
     ''' Splitting te dataset based on publishing year of publication '''
     trainIdx = df['target_year'][df['target_year'] < year].index
     testIdx  = df['target_year'][df['target_year'] >= year].index
-    trainDf  = df.loc[trainIdx]
+    trainDF  = df.loc[trainIdx]
     testDF   = df.loc[testIdx]
     return trainDF, testDF
 
@@ -56,25 +56,25 @@ def loadDataset():
 
 
     trainDF, testDF                 = split_dataset(df, config.YEAR)
-    trainDF, testDF, labelGenerator = get_label(df, train_df, test_df)
+    trainDF, testDF, labelGenerator = get_label(df, trainDF, testDF)
 
     trainDF = trainDF.reset_index(drop=True)
     testDF  = testDF.reset_index(drop=True)
 
 
-    trainDatatset = BertBaseDataset(
-        contextLeft=trainDF["leftSTRING"].values, 
-        contextRight=trainDF["rightSTRING"], 
-        targetIndex = trainDF["LabelIndex"],
+    trainDatatset = Dataset.BertBaseDataset(
+        contextLeft=trainDF["leftSTRING"].values,  
+        targetIndex = trainDF["LabelIndex"].values,
+        contextRight=trainDF["rightSTRING"].values,
         isRight = config.isRight
         )
 
-    testDatatset  = BertBaseDataset(
+    testDatatset  = Dataset.BertBaseDataset(
         contextLeft=testDF["leftSTRING"].values,
-        contextRight=testDF["rightSTRING"],
-        targetIndex = trainDF["LabelIndex"],
+        targetIndex = trainDF["LabelIndex"].values,
+        contextRight=testDF["rightSTRING"].values,
         isRight = config.isRight
         )
 
-    return trainDatatset, testDatatset
+    return trainDatatset, testDatatset, labelGenerator
 

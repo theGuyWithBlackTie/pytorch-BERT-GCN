@@ -2,23 +2,25 @@ import torch
 from transformers import AdamW
 from transformers import get_linear_schedule_with_warmup
 
-
+import engine
 import config
+import utils
+import model
 
 def run():
     trainDataset, testDataset, labelGenerator = utils.loadDataset()
 
     # Making DataLoaders
-    trainDataLoader = torch.utils.DataLoader(trainDataset, batch_size=config.TRAIN_BATCH_SIZE,shuffle=True, num_workers=2)
+    trainDataLoader = torch.utils.data.DataLoader(trainDataset, batch_size=config.TRAIN_BATCH_SIZE,shuffle=True, num_workers=1)
     testDataLoader  = torch.utils.data.DataLoader(testDataset, batch_size=config.TEST_BATCH_SIZE, num_workers=1)
 
     totalNOsOfLabels = len(labelGenerator.classes_)
 
     device = torch.device(config.DEVICE)
-    model = model.BERTBaseUncased(dropout=config.DROPOUT, numOfLabels=totoalNOsOfLabels)
-    model.to(device)
+    citemodel = model.BERTBaseUncased(numOfLabels=totalNOsOfLabels, dropout=config.DROPOUT )
+    citemodel.to(device)
 
-    param_optimizer = list(model.named_parameters())
+    param_optimizer = list(citemodel.named_parameters())
     no_decay        = ["bias", "LayerNorm.bias", "LayerNorm.weight"]
 
     optimizer_parameters = [
@@ -45,7 +47,7 @@ def run():
 
     best_accuracy = 0
     for epoch in range(config.EPOCHS):
-        engine.train
+        engine.train(trainDataLoader, citemodel, optimizer, device, scheduler)
 
 if __name__ == "__main__":
     run()
