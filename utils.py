@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
+import scipy.stats as ss
 
 import Dataset
 import config
@@ -77,4 +78,59 @@ def loadDataset():
         )
 
     return trainDatatset, testDatatset, labelGenerator
+
+def writeMetrics(text, path):
+    print(text)
+    with open(path, 'a+') as metricFile:
+        metricFile.write(text)
+
+
+
+def recall(eachLabelRank, real, topK):
+    totalTestNos = len(real)
+    for eachElem in topK:
+        count = 0
+        for index in range(0, totalTestNos):    # traversing through all rows
+            labelIndex = real[i]
+            if eachLabelRank[i][labelIndex] < eachElem:
+                count += 1
+        result = count / totalTestNos
+        text   = 'Recall@'+eachElem+' : '+result
+        writeMetrics(text, config.METRICS_PATH)
+
+
+
+def mrr(eachLabelRank, real):
+    totalTestNos = len(real)
+    rrSum    = 0
+    for index in range(0, totalTestNos):
+        rank   = eachLabelRank[i][index]
+        rrSum += 1/rank
+    
+    mrrSum = rrSum / totalTestNos
+    text   = 'mrr: '+mrrSum
+    writeMetrics(text, config.METRICS_PATH)
+
+'''
+def map(eachLabelRank, real): # I am not sure whether this metric is correctly calculated or not
+    realRankMatrix = np.zeros(eachLabelRank.shape)
+    for index in range(0, len(real)):
+        realRankMatrix[index][real[index]] = 1
+'''
+
+def metric(predicted, real):
+    ranks = []
+    for eachElem in predicted:
+        ranks.append(ss.rankdata(eachElem))
+    
+    topK = [5, 10, 30, 50, 80]
+    print('Calculating Recalls Now...')
+    recall(ranks, real, topK)
+
+    print('Calculating Mean Reciprocal Rank (MRR) now...')
+    mrr(ranks, real)
+
+    #print('Calculating Mean Average Precision (MAP) now...')
+    #map(ranks, real)
+
 

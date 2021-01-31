@@ -45,9 +45,33 @@ def run():
         optimizer, num_warmup_steps=0, num_training_steps=num_train_steps
     )
 
-    best_accuracy = 0
     for epoch in range(config.EPOCHS):
-        engine.train(trainDataLoader, citemodel, optimizer, device, scheduler)
+        print('Running Epoch ',epoch)
+        loss = engine.train(trainDataLoader, citemodel, optimizer, device, scheduler)
+        print("Epoch: ", epoch, " Loss: ",loss,'\n')
+
+    # Saving the model
+    torch.save(model.state_dict(), config.MODEL_SAVED)
+    print('Model is saved at: ',config.MODEL_SAVED)
+
+    '''
+     Evaluating the model
+    '''
+    outputs, targets = engine.eval(testDataLoader,model,device)
+    # Saving the results with corresponding targets
+    with open(config.PREDICTIONS_PATH, 'wb') as f:
+        pickle.dump(outputs, f) # First saved the predicted outputs
+        pickle.dump(targets, f) # Then saved the corresponding targets
+
+    print('Starting Evaluation...')
+    utils.metric(outputs,targets)
+
+    
+
+    
+
+
+
 
 if __name__ == "__main__":
     run()
