@@ -16,6 +16,6 @@ YEAR = 2017
 isRight = True
 
 # Paths
-MODEL_SAVED = '/outputs/PeerRead/model/state_dict_model.pt'
-PREDICTIONS_PATH = '/outputs/PeerRead/predictions/final_results_and_targets.pkl'
-METRICS_PATH = '/outputs/PeerRead/metric/metric.txt'
+MODEL_SAVED = 'outputs/PeerRead/model/state_dict_model.pt'
+PREDICTIONS_PATH = 'outputs/PeerRead/predictions/final_results_and_targets.pkl'
+METRICS_PATH = 'outputs/PeerRead/metric/metric.txt'

@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
@@ -81,6 +82,7 @@ def loadDataset():
 
 def writeMetrics(text, path):
     print(text)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'a+') as metricFile:
         metricFile.write(text)
 
@@ -91,11 +93,11 @@ def recall(eachLabelRank, real, topK):
     for eachElem in topK:
         count = 0
         for index in range(0, totalTestNos):    # traversing through all rows
-            labelIndex = real[i]
-            if eachLabelRank[i][labelIndex] < eachElem:
+            labelIndex = real[index]
+            if eachLabelRank[index][labelIndex] <= eachElem:
                 count += 1
         result = count / totalTestNos
-        text   = 'Recall@'+eachElem+' : '+result
+        text   = 'Recall@'+str(eachElem)+' : '+str(result)+'\n'
         writeMetrics(text, config.METRICS_PATH)
 
 
@@ -104,11 +106,11 @@ def mrr(eachLabelRank, real):
     totalTestNos = len(real)
     rrSum    = 0
     for index in range(0, totalTestNos):
-        rank   = eachLabelRank[i][index]
+        rank   = eachLabelRank[index][real[index]]
         rrSum += 1/rank
     
     mrrSum = rrSum / totalTestNos
-    text   = 'mrr: '+mrrSum
+    text   = 'mrr: '+str(mrrSum)+'\n'
     writeMetrics(text, config.METRICS_PATH)
 
 '''

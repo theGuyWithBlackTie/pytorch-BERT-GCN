@@ -1,3 +1,5 @@
+import os
+import pickle
 import torch
 from transformers import AdamW
 from transformers import get_linear_schedule_with_warmup
@@ -11,7 +13,7 @@ def run():
     trainDataset, testDataset, labelGenerator = utils.loadDataset()
 
     # Making DataLoaders
-    trainDataLoader = torch.utils.data.DataLoader(trainDataset, batch_size=config.TRAIN_BATCH_SIZE,shuffle=True, num_workers=1)
+    trainDataLoader = torch.utils.data.DataLoader(trainDataset, batch_size=config.TRAIN_BATCH_SIZE,shuffle=True, num_workers=4)
     testDataLoader  = torch.utils.data.DataLoader(testDataset, batch_size=config.TEST_BATCH_SIZE, num_workers=1)
 
     totalNOsOfLabels = len(labelGenerator.classes_)
@@ -46,19 +48,20 @@ def run():
     )
 
     for epoch in range(config.EPOCHS):
-        print('Running Epoch ',epoch)
         loss = engine.train(trainDataLoader, citemodel, optimizer, device, scheduler)
         print("Epoch: ", epoch, " Loss: ",loss,'\n')
 
     # Saving the model
-    torch.save(model.state_dict(), config.MODEL_SAVED)
+    os.makedirs(os.path.dirname(config.MODEL_SAVED), exist_ok=True)
+    torch.save(citemodel.state_dict(), config.MODEL_SAVED)
     print('Model is saved at: ',config.MODEL_SAVED)
 
     '''
      Evaluating the model
     '''
-    outputs, targets = engine.eval(testDataLoader,model,device)
+    outputs, targets = engine.eval(testDataLoader,citemodel,device)
     # Saving the results with corresponding targets
+    os.makedirs(os.path.dirname(config.PREDICTIONS_PATH), exist_ok=True)
     with open(config.PREDICTIONS_PATH, 'wb') as f:
         pickle.dump(outputs, f) # First saved the predicted outputs
         pickle.dump(targets, f) # Then saved the corresponding targets
