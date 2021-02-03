@@ -8,6 +8,7 @@ import engine
 import config
 import utils
 import model
+import argparse
 
 def run():
     trainDataset, testDataset, labelGenerator = utils.loadDataset()
@@ -46,20 +47,30 @@ def run():
     scheduler       = get_linear_schedule_with_warmup(
         optimizer, num_warmup_steps=0, num_training_steps=num_train_steps
     )
+    
+    if config.dotrain:
+        print('In Training')
+        exit()
+        for epoch in range(config.EPOCHS):
+            loss = engine.train(trainDataLoader, citemodel, optimizer, device, scheduler)
+            print("Epoch: ", epoch, " Loss: ",loss,'\n')
 
-    for epoch in range(config.EPOCHS):
-        loss = engine.train(trainDataLoader, citemodel, optimizer, device, scheduler)
-        print("Epoch: ", epoch, " Loss: ",loss,'\n')
 
-    # Saving the model
-    os.makedirs(os.path.dirname(config.MODEL_SAVED), exist_ok=True)
-    torch.save(citemodel.state_dict(), config.MODEL_SAVED)
-    print('Model is saved at: ',config.MODEL_SAVED)
+        # Saving the model
+        os.makedirs(os.path.dirname(config.MODEL_SAVED), exist_ok=True)
+        torch.save(citemodel.state_dict(), config.MODEL_SAVED)
+        print('Model is saved at: ',config.MODEL_SAVED)
 
     '''
      Evaluating the model
     '''
-    outputs, targets = engine.eval(testDataLoader,citemodel,device)
+
+    print("Loading the model")
+    exit()
+    #citemodel = model.BERTBaseUncased(*args, **kwargs)
+    citemodel.load_state_dict(torch.load(config.MODEL_SAVED))
+    outputs, targets = engine.eval(trainDataLoader,citemodel,device)
+    
     # Saving the results with corresponding targets
     os.makedirs(os.path.dirname(config.PREDICTIONS_PATH), exist_ok=True)
     with open(config.PREDICTIONS_PATH, 'wb') as f:
@@ -77,4 +88,14 @@ def run():
 
 
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--do-train', dest="doTrain", required=True, type=str, help="Enter True or False")
+    args   = parser.parse_args()
+
+    if args.doTrain.lower() == "True".lower():
+        config.dotrain = True
+    else:
+        config.dotrain = False
+
     run()

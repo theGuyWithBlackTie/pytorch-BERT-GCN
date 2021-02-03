@@ -49,10 +49,12 @@ def eval(dataLoader, model, device):
             targets        = target.to(device, dtype=torch.long)
 
             outputs = model(ids=ids, mask=mask, token_type_ids=token_type_ids)
+            #print("Outputs are: \n",outputs.shape,' target.shape: ',target.shape)
+            #print("F.log_softmax(outputs):\n\n",F.log_softmax(outputs)[0])
+            #print("torch.exp(F.log_softmax(outputs)):\n\n",torch.exp(F.log_softmax(outputs)))
 
-            finalOutputs.extend(F.log_softmax(outputs).cpu().detach().numpy().tolist())
+            finalOutputs.extend(F.softmax(outputs).cpu().detach().numpy().tolist())
             finalTargets.extend(target.cpu().detach().numpy().tolist())
 
     return finalOutputs, finalTargets
-
 

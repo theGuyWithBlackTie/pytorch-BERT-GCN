@@ -36,7 +36,7 @@ def get_label(df, trainDF, testDF):
     label.fit_transform(df['source_id'].values)
     trainDF = convert_argmax(trainDF, label)
     testDF  = convert_argmax(testDF, label)
-
+    print('Shape of trainDF is: ',trainDF.shape,' and of testDF is: ',testDF.shape)
     return trainDF, testDF, label
 
 
@@ -94,6 +94,7 @@ def recall(eachLabelRank, real, topK):
         count = 0
         for index in range(0, totalTestNos):    # traversing through all rows
             labelIndex = real[index]
+            #print('labelIndex: ',labelIndex,' ----- eachLabelRank[index][labelIndex]', eachLabelRank[index][labelIndex])
             if eachLabelRank[index][labelIndex] <= eachElem:
                 count += 1
         result = count / totalTestNos
@@ -123,7 +124,7 @@ def map(eachLabelRank, real): # I am not sure whether this metric is correctly c
 def metric(predicted, real):
     ranks = []
     for eachElem in predicted:
-        ranks.append(ss.rankdata(eachElem))
+        ranks.append(len(eachElem) + 1 - ss.rankdata(eachElem))
     
     topK = [5, 10, 30, 50, 80]
     print('Calculating Recalls Now...')
