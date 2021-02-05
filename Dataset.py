@@ -7,13 +7,14 @@ class BertBaseDataset:
         self.contextRight = contextRight
         self.targetIndex  = targetIndex
         self.tokenizer    = config.TOKENIZER
-        #self.max_len      = config.MAX_LEN
+        self.max_len      = config.BERT_INPUT_MAX_LEN
         self.isRight      = isRight
+        '''
         if(self.isRight):
             self.max_len = (config.MAX_LEN*2)+3
         else:
             self.max_len = config.MAX_LEN+2
-
+        '''
 
 
     # This dataset class is a Map-style dataset

@@ -12,6 +12,7 @@ def loss_fn(outputs, targets):
 
 def train(dataLoader, model, optimizer, device, scheduler):
     model.train()
+    resultloss = 0
     for bi, d in tqdm(enumerate(dataLoader), total=len(dataLoader)):
         ids            = d["ids"]
         token_type_ids = d["token_type_ids"]
@@ -30,7 +31,8 @@ def train(dataLoader, model, optimizer, device, scheduler):
         loss.backward()
         optimizer.step()
         scheduler.step()
-    return loss
+        resultloss += loss
+    return resultloss/len(dataLoader)
 
 def eval(dataLoader, model, device):
     model.eval()

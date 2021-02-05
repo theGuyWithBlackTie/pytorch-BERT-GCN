@@ -1,4 +1,6 @@
 import os
+import datetime
+
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
@@ -36,7 +38,7 @@ def get_label(df, trainDF, testDF):
     label.fit_transform(df['source_id'].values)
     trainDF = convert_argmax(trainDF, label)
     testDF  = convert_argmax(testDF, label)
-    print('Shape of trainDF is: ',trainDF.shape,' and of testDF is: ',testDF.shape)
+    #print('Shape of trainDF is: ',trainDF.shape,' and of testDF is: ',testDF.shape)
     return trainDF, testDF, label
 
 
@@ -54,7 +56,7 @@ def loadDataset():
     column   = ['left_citated_text', 'right_citated_text', 'target_id', 'source_id', 'target_year', 'target_author']
     df       = dataFile[column]
     df       = cut_off_dataset(df, config.FREQUENCY)
-    df       = slicing_citation_text(df, config.MAX_LEN)
+    df       = slicing_citation_text(df, config.SEQ_LENGTH)
 
 
     trainDF, testDF                 = split_dataset(df, config.YEAR)
@@ -99,7 +101,7 @@ def recall(eachLabelRank, real, topK):
                 count += 1
         result = count / totalTestNos
         text   = 'Recall@'+str(eachElem)+' : '+str(result)+'\n'
-        writeMetrics(text, config.METRICS_PATH)
+        writeMetrics(text, config.METRICS_PATH.format(config.modelName))
 
 
 
@@ -112,7 +114,7 @@ def mrr(eachLabelRank, real):
     
     mrrSum = rrSum / totalTestNos
     text   = 'mrr: '+str(mrrSum)+'\n'
-    writeMetrics(text, config.METRICS_PATH)
+    writeMetrics(text, config.METRICS_PATH.format(config.modelName))
 
 '''
 def map(eachLabelRank, real): # I am not sure whether this metric is correctly calculated or not
@@ -126,6 +128,7 @@ def metric(predicted, real):
     for eachElem in predicted:
         ranks.append(len(eachElem) + 1 - ss.rankdata(eachElem))
     
+    writeMetrics(str(datetime.datetime.now()), config.METRICS_PATH.format(config.modelName))
     topK = [5, 10, 30, 50, 80]
     print('Calculating Recalls Now...')
     recall(ranks, real, topK)
