@@ -56,7 +56,7 @@ def run():
     num_train_steps = int( len(trainDataLoader) * config.EPOCHS )
     optimizer       = AdamW(optimizer_parameters, lr=2e-5)
     scheduler       = get_linear_schedule_with_warmup(
-        optimizer, num_warmup_steps=0, num_training_steps=num_train_steps
+        optimizer, num_warmup_steps=num_train_steps*config.WARMUP_PROPORTION, num_training_steps=num_train_steps
     )
     
     if config.dotrain:

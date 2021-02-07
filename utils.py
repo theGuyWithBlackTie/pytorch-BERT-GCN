@@ -128,7 +128,7 @@ def metric(predicted, real):
     for eachElem in predicted:
         ranks.append(len(eachElem) + 1 - ss.rankdata(eachElem))
     
-    writeMetrics(str(datetime.datetime.now()), config.METRICS_PATH.format(config.modelName))
+    writeMetrics("\n"+str(datetime.datetime.now()+"\n"), config.METRICS_PATH.format(config.modelName))
     topK = [5, 10, 30, 50, 80]
     print('Calculating Recalls Now...')
     recall(ranks, real, topK)

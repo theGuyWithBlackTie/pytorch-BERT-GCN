@@ -38,6 +38,7 @@ def eval(dataLoader, model, device):
     model.eval()
     finalOutputs = []
     finalTargets = []
+    tempLoss = 0
     with torch.no_grad():
         for bi, d in tqdm(enumerate(dataLoader), total=len(dataLoader)):
             ids            = d["ids"]
@@ -54,9 +55,10 @@ def eval(dataLoader, model, device):
             #print("Outputs are: \n",outputs.shape,' target.shape: ',target.shape)
             #print("F.log_softmax(outputs):\n\n",F.log_softmax(outputs)[0])
             #print("torch.exp(F.log_softmax(outputs)):\n\n",torch.exp(F.log_softmax(outputs)))
+            tempLoss += loss_fn(outputs, targets)
 
             finalOutputs.extend(F.softmax(outputs).cpu().detach().numpy().tolist())
             finalTargets.extend(target.cpu().detach().numpy().tolist())
-
+    print('Validtion Loss:-',tempLoss/len(dataLoader))
     return finalOutputs, finalTargets
 
