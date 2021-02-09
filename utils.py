@@ -75,7 +75,7 @@ def loadDataset():
 
     testDatatset  = Dataset.BertBaseDataset(
         contextLeft=testDF["leftSTRING"].values,
-        targetIndex = trainDF["LabelIndex"].values,
+        targetIndex = testDF["LabelIndex"].values,
         contextRight=testDF["rightSTRING"].values,
         isRight = config.isRight
         )
@@ -128,7 +128,7 @@ def metric(predicted, real):
     for eachElem in predicted:
         ranks.append(len(eachElem) + 1 - ss.rankdata(eachElem))
     
-    writeMetrics("\n"+str(datetime.datetime.now()+"\n"), config.METRICS_PATH.format(config.modelName))
+    writeMetrics("\n"+str(datetime.datetime.now())+"\n", config.METRICS_PATH.format(config.modelName))
     topK = [5, 10, 30, 50, 80]
     print('Calculating Recalls Now...')
     recall(ranks, real, topK)

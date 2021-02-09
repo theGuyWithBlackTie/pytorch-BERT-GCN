@@ -6,7 +6,7 @@ import config
 class BERTBaseUncased(nn.Module):
     def __init__(self, numOfLabels, dropout = 0.1):
         super(BERTBaseUncased, self).__init__()
-        self.bert = transformers.BertModel.from_pretrained(config.BERT_PATH)
+        self.bert = BertModel.from_pretrained(config.BERT_PATH)
         self.dropout = nn.Dropout(dropout)
         self.out     = nn.Linear(768, numOfLabels)
 
@@ -20,7 +20,7 @@ class BERTBaseUncased(nn.Module):
 class SciBertUncased(nn.Module):
     def __init__(self, numOfLabels, dropout = 0.1):
         super(SciBertUncased, self).__init__()
-        self.sciBert = AutoModel.from_pretrained('allenai/scibert_scivocab_uncased')
+        self.sciBert = AutoModel.from_pretrained(config.SCI_BERT_PATH)
         self.dropout = nn.Dropout(dropout)
         self.out     = nn.Linear(768, numOfLabels)
 

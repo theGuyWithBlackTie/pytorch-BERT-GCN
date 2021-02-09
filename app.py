@@ -34,8 +34,9 @@ def run():
     '''
         There is generally no need to apply L2 penalty (i.e. weight decay) to biases and LayerNorm.weight. 
         Hence, we have following line.
+        Update: There is need to apply L2 to LayerNorm.weight as per Google TF implementation so reverting it ;)
     '''
-    no_decay        = ["bias", "LayerNorm.weight"] # Removed "LayerNorm.bias",
+    no_decay        = ["bias", "LayerNorm.bias", "LayerNorm.weight"] # Removed "LayerNorm.bias",
 
     optimizer_parameters = [
         {
@@ -54,7 +55,7 @@ def run():
     ]
 
     num_train_steps = int( len(trainDataLoader) * config.EPOCHS )
-    optimizer       = AdamW(optimizer_parameters, lr=2e-5)
+    optimizer       = AdamW(optimizer_parameters, lr=1e-5) # changed from 2e-5 to 1e-5
     scheduler       = get_linear_schedule_with_warmup(
         optimizer, num_warmup_steps=num_train_steps*config.WARMUP_PROPORTION, num_training_steps=num_train_steps
     )
@@ -62,8 +63,8 @@ def run():
     if config.dotrain:
         print('In Training')
         for epoch in range(config.EPOCHS):
-            loss = engine.train(trainDataLoader, citemodel, optimizer, device, scheduler)
-            print("Epoch: ", epoch, " Loss: ",loss,'\n')
+            trainingLoss = engine.train(trainDataLoader, citemodel, optimizer, device, scheduler)
+            print("Epoch: ", epoch, " Loss: ",trainingLoss,'\n')
 
 
         # Saving the model
@@ -104,9 +105,7 @@ if __name__ == "__main__":
     else:
         config.dotrain = False
 
-    if args.model.lower() == "BertBase".lower():
-        config.modelName = "BertBase"
-    elif args.model.lower() == "SciBert".lower():
-        config.modelName = "SciBert"
+    if args.model.lower() == "SciBert".lower():
+        config.modelName = "SciBert"         # default is set to "BertBase"
 
     run()

@@ -8,6 +8,7 @@ TRAIN_BATCH_SIZE = 16
 TEST_BATCH_SIZE  = 8
 EPOCHS           = 30
 BERT_PATH = "bert-base-uncased"
+SCI_BERT_PATH = "allenai/scibert_scivocab_uncased"
 TOKENIZER = transformers.BertTokenizer.from_pretrained(BERT_PATH, do_lower_case=True)
 DROPOUT   = 0.1
 WARMUP_PROPORTION = 0.1 # 10% of total
