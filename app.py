@@ -14,7 +14,7 @@ def run():
     trainDataset, testDataset, labelGenerator = utils.loadDataset()
 
     # Making DataLoaders
-    trainDataLoader = torch.utils.data.DataLoader(trainDataset, batch_size=config.TRAIN_BATCH_SIZE,shuffle=True, num_workers=4)
+    trainDataLoader = torch.utils.data.DataLoader(trainDataset, batch_size=config.TRAIN_BATCH_SIZE,shuffle=True, num_workers=4, pin_memory=True)
     testDataLoader  = torch.utils.data.DataLoader(testDataset, batch_size=config.TEST_BATCH_SIZE, num_workers=1)
 
     totalNOsOfLabels = len(labelGenerator.classes_)
@@ -22,6 +22,7 @@ def run():
     device = torch.device(config.DEVICE)
     
     # Defining Model
+    print("Making model:- ",config.modelName)
     citeModel = None
     if config.modelName == "BertBase":
         citemodel = model.BERTBaseUncased(numOfLabels=totalNOsOfLabels, dropout=config.DROPOUT )
@@ -55,7 +56,7 @@ def run():
     ]
 
     num_train_steps = int( len(trainDataLoader) * config.EPOCHS )
-    optimizer       = AdamW(optimizer_parameters, lr=1e-5) # changed from 2e-5 to 1e-5
+    optimizer       = AdamW(optimizer_parameters, lr=config.LEARNING_RATE)
     scheduler       = get_linear_schedule_with_warmup(
         optimizer, num_warmup_steps=num_train_steps*config.WARMUP_PROPORTION, num_training_steps=num_train_steps
     )

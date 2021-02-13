@@ -6,8 +6,14 @@ class BertBaseDataset:
         self.contextLeft  = contextLeft
         self.contextRight = contextRight
         self.targetIndex  = targetIndex
-        self.tokenizer    = config.TOKENIZER
-        self.max_len      = config.BERT_INPUT_MAX_LEN
+
+        # Assigning tokenizer based on model being used
+        if config.modelName == "SciBert":
+            self.tokenizer = config.SCI_TOKENIZER
+        else:
+            self.tokenizer = config.BERT_TOKENIZER
+        
+        self.max_len      = config.INPUT_MAX_LEN
         self.isRight      = isRight
         '''
         if(self.isRight):

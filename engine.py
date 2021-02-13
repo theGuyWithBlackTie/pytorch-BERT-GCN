@@ -57,7 +57,7 @@ def eval(dataLoader, model, device):
             #print("torch.exp(F.log_softmax(outputs)):\n\n",torch.exp(F.log_softmax(outputs)))
             tempLoss += loss_fn(outputs, targets)
 
-            finalOutputs.extend(F.softmax(outputs).cpu().detach().numpy().tolist())
+            finalOutputs.extend(F.softmax(outputs, dim=1).cpu().detach().numpy().tolist())
             finalTargets.extend(target.cpu().detach().numpy().tolist())
     print('Validtion Loss:-',tempLoss/len(dataLoader))
     return finalOutputs, finalTargets
